@@ -1,11 +1,12 @@
-# Treize grammes - Branding Agency
+# Clague Creative - Branding Agency
 
-Modern showcase and website for Treize grammes, a branding and digital strategy agency.
+Modern showcase and website for Clague Creative, a digital branding and strategy agency.
 
 ## Features
 - Complete brand showcase & portfolio presentations (30+ case studies)
-- Interactive service offerings and multi-step inquiry forms
-- Fully translated English version with modern typography and animations
+- Interactive service offerings (Brand Creation & Rebranding, Web Design, Campaigns & Activation)
+- Multi-step client inquiry questionnaire and consultation booking
+- 100% English translation with modern typography and animations
 - Built with Vite for rapid local development and bundling
 
 ## Getting Started
