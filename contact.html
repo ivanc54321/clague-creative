@@ -459,6 +459,7 @@ for (var i = 0; i < tricksLetter.length; i++) {
 }
 // animation stagger scroll
 function myFade() {
+  window.myFade = myFade;
   gsap.registerPlugin(ScrollTrigger);
   ScrollTrigger.defaults({
     markers: false

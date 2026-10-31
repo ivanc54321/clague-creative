@@ -1,16 +1,41 @@
 let loaderInitialized = false;
 let fadeExecuted = false;
+let fadeAttempts = 0;
+
+function revealFadeElementsFallback() {
+  fadeExecuted = true;
+  const elements = document.querySelectorAll(
+    "[fade-up], [fade-nav], [fade-up-hero-delay], .tricksword, [fade-right], [fade-left]"
+  );
+  elements.forEach((el) => {
+    el.style.opacity = "1";
+    el.style.transform = "none";
+  });
+  const pageWrapper = document.querySelector(".page-wrapper");
+  if (pageWrapper) {
+    pageWrapper.style.opacity = "1";
+  }
+}
 
 function triggerMyFade() {
   if (fadeExecuted) return;
   if (typeof window.myFade === "function") {
     fadeExecuted = true;
-    window.myFade();
+    try {
+      window.myFade();
+    } catch (e) {
+      console.warn("Error running myFade, using fallback:", e);
+      revealFadeElementsFallback();
+    }
     if (typeof ScrollTrigger !== "undefined") {
       setTimeout(() => ScrollTrigger.refresh(), 100);
     }
-  } else {
+  } else if (fadeAttempts < 20) {
+    fadeAttempts++;
     setTimeout(triggerMyFade, 50);
+  } else {
+    // Safety fallback: reveal all content after 1s if myFade wasn't attached
+    revealFadeElementsFallback();
   }
 }
 
@@ -23,6 +48,14 @@ function s() {
     triggerMyFade();
     return;
   }
+
+  // Safety fallback: ensure loader never blocks the page for more than 2 seconds
+  setTimeout(() => {
+    if (loader && loader.style.display !== "none") {
+      loader.style.display = "none";
+      triggerMyFade();
+    }
+  }, 2000);
 
   if (localStorage.getItem("loaderPlayed") === "true") {
     loader.style.display = "none";
