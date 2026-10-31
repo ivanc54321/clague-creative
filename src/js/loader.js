@@ -1,48 +1,68 @@
+let loaderInitialized = false;
+let fadeExecuted = false;
+
+function triggerMyFade() {
+  if (fadeExecuted) return;
+  if (typeof window.myFade === "function") {
+    fadeExecuted = true;
+    window.myFade();
+    if (typeof ScrollTrigger !== "undefined") {
+      setTimeout(() => ScrollTrigger.refresh(), 100);
+    }
+  } else {
+    setTimeout(triggerMyFade, 50);
+  }
+}
+
 function s() {
+  if (loaderInitialized) return;
+  loaderInitialized = true;
+
   const loader = document.querySelector(".loader");
   if (!loader) {
-    if (typeof myFade === "function") myFade();
+    triggerMyFade();
     return;
   }
 
   if (localStorage.getItem("loaderPlayed") === "true") {
     loader.style.display = "none";
-    if (typeof myFade === "function") {
-      myFade();
-      if (typeof ScrollTrigger !== "undefined") ScrollTrigger.refresh();
-    }
+    triggerMyFade();
     return;
   }
 
+  localStorage.setItem("loaderPlayed", "true");
   const logo = document.querySelector(".logo-loader-gsap");
+  const logoWrapper = document.querySelector(".loader__logo");
   const colors = ["#131313", "#faaafa", "#e0e055", "#8ddd8d", "#6066ee", "#FFFFFF"];
 
   if (!logo || typeof gsap === "undefined") {
     loader.style.display = "none";
-    if (typeof myFade === "function") myFade();
+    triggerMyFade();
     return;
   }
 
-  setTimeout(() => {
-    gsap.fromTo(
-      logo,
-      { y: 30, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 1.2,
-        ease: "power3.out",
-        onComplete: () => {
-          gsap.to(logo, {
-            y: "-100%",
-            duration: 1,
-            ease: "power3.out",
-            onComplete: cycleColors,
-          });
-        },
-      }
-    );
-  }, 200);
+  if (logoWrapper) {
+    gsap.set(logoWrapper, { y: 0 });
+  }
+
+  gsap.fromTo(
+    logo,
+    { y: 30, opacity: 0 },
+    {
+      y: 0,
+      opacity: 1,
+      duration: 0.4,
+      ease: "power3.out",
+      onComplete: () => {
+        gsap.to(logo, {
+          y: "-100%",
+          duration: 0.3,
+          ease: "power3.out",
+          onComplete: () => cycleColors(0),
+        });
+      },
+    }
+  );
 
   function cycleColors(index = 0) {
     if (index >= colors.length) {
@@ -51,28 +71,25 @@ function s() {
     }
     gsap.to(loader, {
       backgroundColor: colors[index],
-      duration: 0.2,
+      duration: 0.08,
       ease: "power1.inOut",
       onComplete: () => {
         index < colors.length - 1
-          ? setTimeout(() => cycleColors(index + 1), 300)
+          ? setTimeout(() => cycleColors(index + 1), 60)
           : finishLoader();
       },
     });
   }
 
   function finishLoader() {
+    triggerMyFade();
     gsap.to(loader, {
       y: "-100%",
-      duration: 1.2,
+      duration: 0.6,
       ease: "power3.out",
       onComplete: () => {
         loader.style.display = "none";
-        if (typeof myFade === "function") {
-          myFade();
-          if (typeof ScrollTrigger !== "undefined") ScrollTrigger.refresh();
-        }
-        localStorage.setItem("loaderPlayed", "true");
+        if (typeof ScrollTrigger !== "undefined") ScrollTrigger.refresh();
       },
     });
   }
